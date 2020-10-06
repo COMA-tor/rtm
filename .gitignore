@@ -133,6 +133,5 @@ fabric.properties
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
-.devcontainer
 
 # End of https://www.toptal.com/developers/gitignore/api/vscode,intellij,go

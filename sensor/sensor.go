@@ -6,24 +6,25 @@ import (
 	"time"
 )
 
-type config struct {
-	interval        time.Duration
-	min, max        float64
-	logFormat, unit string
+// Configuration used by the sensor.
+type Configuration struct {
+	Interval        time.Duration
+	Min, Max        float64
+	LogFormat, Unit string
 }
 
 // Run the sensor with the given configuration and that use the given generator
 // function.
-func Run(cfg config, generator GeneratorFunc) {
+func Run(cfg Configuration, generator GeneratorFunc) {
 	for {
 		select {
-		case <-time.Tick(cfg.interval * time.Second):
+		case <-time.Tick(cfg.Interval * time.Second):
 			unix := time.Now().Unix()
 			value := generator(unix)
-			if cfg.logFormat == "" {
-				cfg.logFormat = "%.4f%s"
+			if cfg.LogFormat == "" {
+				cfg.LogFormat = "%.4f%s"
 			}
-			tmpl, err := template.New("log").Parse(cfg.logFormat)
+			tmpl, err := template.New("log").Parse(cfg.LogFormat)
 
 			if err != nil {
 				log.Fatal("Error creating log template at sensor.run:", err)
@@ -32,7 +33,7 @@ func Run(cfg config, generator GeneratorFunc) {
 			data := struct {
 				Value float64
 				Unit  string
-			}{value, cfg.unit}
+			}{value, cfg.Unit}
 
 			err = tmpl.Execute(log.Writer(), data)
 

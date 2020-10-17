@@ -1,8 +1,9 @@
 package sensor
 
 import (
-	"github.com/aquilax/go-perlin"
 	"time"
+
+	"github.com/aquilax/go-perlin"
 )
 
 type GeneratorFunc func(int64) float64

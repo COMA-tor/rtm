@@ -6,25 +6,14 @@ import (
 	"time"
 )
 
-/*
-opt := NewClientOptions()
-opt.AddBroker("tcp://172.16.128.80:1883")
-
-client := NewClient(opt)
-defer client.Disconnect(250)
-
-if token := client.Connect(); token.Wait() && token.Error() != nil {
-	log.Fatal(token.Error())
-	return
-}
-*/
-
 type config struct {
 	interval        time.Duration
 	min, max        float64
 	logFormat, unit string
 }
 
+// Run the sensor with the given configuration and that use the given generator
+// function.
 func Run(cfg config, generator GeneratorFunc) {
 	for {
 		select {

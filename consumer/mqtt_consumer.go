@@ -15,7 +15,7 @@ const brokerHost = "localhost"
 const brokerPort = "1883"
 const clientId = "CLIENT-001"
 
-func NewMqttConsumer() MqttConsumer {
+func NewMqttConsumer(handleData func(bytes []byte)) MqttConsumer {
 	log.Printf("Trying to connect (%s, %s)", brokerHost, brokerPort)
 
 	opts := mqtt.NewClientOptions()
@@ -28,7 +28,7 @@ func NewMqttConsumer() MqttConsumer {
 		log.Fatal(token.Error())
 	}
 
-	log.Println("client1 is connected :",client.IsConnected())
+	log.Println("client is connected :",client.IsConnected())
 
 	return MqttConsumer{
 		DefaultConsumer: DefaultConsumer{
@@ -39,9 +39,7 @@ func NewMqttConsumer() MqttConsumer {
 				})
 				return out
 			},
-			handleData: func(bytes []byte) {
-				log.Printf("Data received: %v", bytes)
-			},
+			handleData: handleData,
 		},
 		client: client,
 	}

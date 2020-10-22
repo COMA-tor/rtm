@@ -1,6 +1,10 @@
-package main
+package agent
 
-import "time"
+import (
+	"time"
+
+	"github.com/COMA-tor/rtm/sensor"
+)
 
 type Agent interface {
 	Run() error
@@ -37,7 +41,7 @@ type MeasurementAgent struct {
 	DefaultAgent
 }
 
-func NewMeasurementAgent(sensor Sensor, measurementHandler func([]byte)) Agent {
+func NewMeasurementAgent(sensor sensor.Sensor, measurementHandler func([]byte)) Agent {
 	agent := WithHandler(NewAgent(), func() {
 		value := sensor.Value()
 		measurementHandler(value)

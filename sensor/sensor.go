@@ -1,4 +1,4 @@
-package main
+package sensor
 
 type Sensor interface {
 	Value() []byte

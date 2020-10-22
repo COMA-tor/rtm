@@ -1,18 +1,19 @@
-package main
+package agent
 
 import (
 	"errors"
 	"time"
 
+	"github.com/COMA-tor/rtm/sensor"
 	"github.com/cucumber/godog"
 )
 
 var agent Agent
-var sensor Sensor
+var sensorFeature sensor.Sensor
 var measurements [][]byte
 
 func iRunAnAgentThatUseIt() error {
-	agent = NewMeasurementAgent(sensor, func(m []byte) {
+	agent = NewMeasurementAgent(sensorFeature, func(m []byte) {
 		measurements = append(measurements, m)
 	})
 	go agent.Run()
@@ -31,7 +32,7 @@ func measurementsShouldBeCollected() error {
 }
 
 func thatThereIsASensor() error {
-	sensor = NewSensor()
+	sensorFeature = sensor.NewSensor()
 	return nil
 }
 

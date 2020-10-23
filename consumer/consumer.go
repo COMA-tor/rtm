@@ -30,6 +30,6 @@ func (d DefaultConsumer) Run() error {
 	}
 }
 
-func WithDataHandler(consumer Consumer, listenData func() <-chan []byte, handleData func([]byte)) DefaultConsumer {
+func WithDataHandler(consumer Consumer, listenData func() <-chan []byte, handleData func([]byte)) Consumer {
 	return DefaultConsumer{Consumer: consumer, listenData: listenData, handleData: handleData}
 }

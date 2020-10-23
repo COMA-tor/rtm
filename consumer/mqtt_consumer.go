@@ -11,10 +11,6 @@ type MqttConsumer struct {
 	client mqtt.Client
 }
 
-const brokerHost = "localhost"
-const brokerPort = "1883"
-const clientId = "CLIENT-001"
-
 func NewMqttConsumer(handleData func(bytes []byte)) MqttConsumer {
 	log.Printf("Trying to connect (%s, %s)", brokerHost, brokerPort)
 

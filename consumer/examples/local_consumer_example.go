@@ -16,6 +16,6 @@ func myListenData() <-chan []byte {
 }
 
 func main() {
-	localMqttConsumer := consumer.NewLocalMqttConsumer(localFile)
+	localMqttConsumer := consumer.NewMqttToLogConsumer(localFile)
 	localMqttConsumer.Run()
 }

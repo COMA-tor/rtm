@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var localConsumer LocalMqttConsumer
+var localConsumer MqttToLogConsumer
 
 const localFile = "examples/data.log"
 
@@ -35,7 +35,7 @@ func theLocalConsumerIsRunning() error {
 }
 
 func thereIsALocalConsumer() error {
-	localConsumer = NewLocalMqttConsumer(localFile)
+	localConsumer = NewMqttToLogConsumer(localFile)
 	localConsumer.listenData = gen
 	return nil
 }
@@ -66,7 +66,7 @@ func itShouldLineBeWrittenInFile(nbLines int) error {
 }
 
 func theLocalConsumerReceiveSliceOfBytes(nbLines int) error {
-	localConsumer = NewLocalMqttConsumer(localFile)
+	localConsumer = NewMqttToLogConsumer(localFile)
 	localConsumer.listenData = func() <-chan []byte {
 		out := make(chan []byte)
 		go func() {

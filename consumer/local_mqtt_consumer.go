@@ -9,7 +9,7 @@ const brokerHost = "localhost"
 const brokerPort = "1883"
 const clientId = "CLIENT-001"
 
-type LocalMqttConsumer struct {
+type MqttToLogConsumer struct {
 	MqttConsumer
 }
 
@@ -38,8 +38,8 @@ func newLocalHandler(file string) func([]byte) {
 	}
 }
 
-func NewLocalMqttConsumer(localFile string) LocalMqttConsumer {
-	return LocalMqttConsumer{
+func NewMqttToLogConsumer(localFile string) MqttToLogConsumer {
+	return MqttToLogConsumer{
 		MqttConsumer: NewMqttConsumer(newLocalHandler(localFile)),
 	}
 }

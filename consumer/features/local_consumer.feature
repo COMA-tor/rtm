@@ -9,4 +9,4 @@ Feature: Receive data and put it in local file
     Given There is a local consumer
     When The local consumer is running
     And The local consumer receive 1 slice of bytes
-    Then It should 1 line be written in file
+    Then 1 line should be written in file

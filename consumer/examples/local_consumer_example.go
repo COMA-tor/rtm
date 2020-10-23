@@ -2,7 +2,7 @@ package main
 
 import "github.com/COMA-tor/rtm/consumer"
 
-var localFile = "consumer/examples/mqtt_data_example.log"
+var logFile = "consumer/examples/mqtt_data_example.log"
 
 func myListenData() <-chan []byte {
 	out := make(chan []byte)
@@ -16,6 +16,6 @@ func myListenData() <-chan []byte {
 }
 
 func main() {
-	localMqttConsumer := consumer.NewMqttToLogConsumer(localFile)
-	localMqttConsumer.Run()
+	loggingMqttConsumer := consumer.NewMqttToLogConsumer(logFile)
+	loggingMqttConsumer.Run()
 }

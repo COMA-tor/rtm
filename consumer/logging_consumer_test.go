@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var localConsumer MqttToLogConsumer
+var loggingConsumer MqttToLogConsumer
 
 const localFile = "examples/data.log"
 
@@ -30,17 +30,17 @@ func itShouldWriteReceivedDataInFile() error {
 }
 
 func theLocalConsumerIsRunning() error {
-	go localConsumer.Run()
+	go loggingConsumer.Run()
 	return nil
 }
 
 func thereIsALocalConsumer() error {
-	localConsumer = NewMqttToLogConsumer(localFile)
-	localConsumer.listenData = gen
+	loggingConsumer = NewMqttToLogConsumer(localFile)
+	loggingConsumer.listenData = gen
 	return nil
 }
 
-func itShouldLineBeWrittenInFile(nbLines int) error {
+func lineShouldBeWrittenInFile(nbLines int) error {
 	select {
 	case <-time.After(time.Millisecond * 10):
 		file, err := os.Open(localFile)
@@ -66,8 +66,8 @@ func itShouldLineBeWrittenInFile(nbLines int) error {
 }
 
 func theLocalConsumerReceiveSliceOfBytes(nbLines int) error {
-	localConsumer = NewMqttToLogConsumer(localFile)
-	localConsumer.listenData = func() <-chan []byte {
+	loggingConsumer = NewMqttToLogConsumer(localFile)
+	loggingConsumer.listenData = func() <-chan []byte {
 		out := make(chan []byte)
 		go func() {
 			for _, n := range make([]int, nbLines) {
@@ -88,6 +88,6 @@ func LocalConsumerFeatureContext(s *godog.Suite) {
 	s.Step(`^It should write received data in file$`, itShouldWriteReceivedDataInFile)
 	s.Step(`^The local consumer is running$`, theLocalConsumerIsRunning)
 	s.Step(`^There is a local consumer$`, thereIsALocalConsumer)
-	s.Step(`^It should (\d+) line be written in file$`, itShouldLineBeWrittenInFile)
+	s.Step(`^(\d+) line should be written in file$`, lineShouldBeWrittenInFile)
 	s.Step(`^The local consumer receive (\d+) slice of bytes$`, theLocalConsumerReceiveSliceOfBytes)
 }

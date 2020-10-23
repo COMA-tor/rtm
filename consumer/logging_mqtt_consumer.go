@@ -40,6 +40,6 @@ func newLogHandler(file string) func([]byte) {
 
 func NewMqttToLogConsumer(logFile string) MqttToLogConsumer {
 	return MqttToLogConsumer{
-		MqttConsumer: NewMqttConsumer(newLogHandler(logFile)),
+		MqttConsumer: NewMqttConsumer("test", newLogHandler(logFile)),
 	}
 }

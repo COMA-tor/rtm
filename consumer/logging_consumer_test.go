@@ -13,12 +13,12 @@ import (
 
 var loggingConsumer MqttToLogConsumer
 
-const localFile = "examples/data.log"
+const logFile = "examples/data.log"
 
 func itShouldWriteReceivedDataInFile() error {
 	select {
 	case <-time.After(time.Millisecond * 10):
-		data, err := ioutil.ReadFile(localFile)
+		data, err := ioutil.ReadFile(logFile)
 		if err != nil {
 			return errors.Unwrap(err)
 		}
@@ -29,13 +29,13 @@ func itShouldWriteReceivedDataInFile() error {
 	}
 }
 
-func theLocalConsumerIsRunning() error {
+func theLogConsumerIsRunning() error {
 	go loggingConsumer.Run()
 	return nil
 }
 
-func thereIsALocalConsumer() error {
-	loggingConsumer = NewMqttToLogConsumer(localFile)
+func thereIsALogConsumer() error {
+	loggingConsumer = NewMqttToLogConsumer(logFile)
 	loggingConsumer.listenData = gen
 	return nil
 }
@@ -43,7 +43,7 @@ func thereIsALocalConsumer() error {
 func lineShouldBeWrittenInFile(nbLines int) error {
 	select {
 	case <-time.After(time.Millisecond * 10):
-		file, err := os.Open(localFile)
+		file, err := os.Open(logFile)
 		if err != nil {
 			return errors.Unwrap(err)
 		}
@@ -65,8 +65,8 @@ func lineShouldBeWrittenInFile(nbLines int) error {
 	}
 }
 
-func theLocalConsumerReceiveSliceOfBytes(nbLines int) error {
-	loggingConsumer = NewMqttToLogConsumer(localFile)
+func theLogConsumerReceiveSliceOfBytes(nbLines int) error {
+	loggingConsumer = NewMqttToLogConsumer(logFile)
 	loggingConsumer.listenData = func() <-chan []byte {
 		out := make(chan []byte)
 		go func() {
@@ -81,13 +81,13 @@ func theLocalConsumerReceiveSliceOfBytes(nbLines int) error {
 }
 
 
-func LocalConsumerFeatureContext(s *godog.Suite) {
+func LogConsumerFeatureContext(s *godog.Suite) {
 	s.BeforeScenario(func(pickle *messages.Pickle) {
-		_ = os.Remove(localFile)
+		_ = os.Remove(logFile)
 	})
 	s.Step(`^It should write received data in file$`, itShouldWriteReceivedDataInFile)
-	s.Step(`^The local consumer is running$`, theLocalConsumerIsRunning)
-	s.Step(`^There is a local consumer$`, thereIsALocalConsumer)
+	s.Step(`^The log consumer is running$`, theLogConsumerIsRunning)
+	s.Step(`^There is a log consumer$`, thereIsALogConsumer)
 	s.Step(`^(\d+) line should be written in file$`, lineShouldBeWrittenInFile)
-	s.Step(`^The local consumer receive (\d+) slice of bytes$`, theLocalConsumerReceiveSliceOfBytes)
+	s.Step(`^The log consumer receive (\d+) slice of bytes$`, theLogConsumerReceiveSliceOfBytes)
 }

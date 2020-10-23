@@ -13,7 +13,7 @@ type MqttToLogConsumer struct {
 	MqttConsumer
 }
 
-func newLocalHandler(file string) func([]byte) {
+func newLogHandler(file string) func([]byte) {
 	return func(data []byte) {
 		if len(data) > 0 {
 			f, err := os.OpenFile(file, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
@@ -38,8 +38,8 @@ func newLocalHandler(file string) func([]byte) {
 	}
 }
 
-func NewMqttToLogConsumer(localFile string) MqttToLogConsumer {
+func NewMqttToLogConsumer(logFile string) MqttToLogConsumer {
 	return MqttToLogConsumer{
-		MqttConsumer: NewMqttConsumer(newLocalHandler(localFile)),
+		MqttConsumer: NewMqttConsumer(newLogHandler(logFile)),
 	}
 }

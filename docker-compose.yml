@@ -1,0 +1,20 @@
+version: "3.8"
+services: 
+    redis:
+        image: redislabs/redistimeseries
+        ports: 
+            - "6379:6379"
+        # volumes:
+        #     - ./dump.rdb:/data/dump.rdb
+    
+    grafana:
+        image: grafana/grafana
+        environment: 
+            - GF_INSTALL_PLUGINS=redis-datasource
+        ports: 
+            - "3000:3000"
+        volumes:
+            - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+            - ./data:/var/lib/grafana
+        links: 
+            - redis

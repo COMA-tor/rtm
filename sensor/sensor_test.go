@@ -52,6 +52,25 @@ func thereIsACallbackFunctionThatReturn(returnValue int) error {
 	return nil
 }
 
+func theValueShouldNotBeNil() error {
+	if value == nil {
+		return fmt.Errorf("expected non nil value, but got %v", value)
+	}
+
+	return nil
+}
+
+func thereIsASensor(sensorType string) error {
+	switch sensorType {
+	case "temperature":
+		sensor = TemperatureSensor()
+	default:
+		return fmt.Errorf("invalid sensor type")
+	}
+
+	return nil
+}
+
 func FeatureContext(s *godog.Suite) {
 	s.Step(`^i read the sensor value$`, iReadTheSensorValue)
 	s.Step(`^the value should be nil$`, theValueShouldBeNil)
@@ -60,4 +79,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the callback function is defined for the sensor$`, theCallbackFunctionIsDefinedForTheSensor)
 	s.Step(`^the value should be (\d+)$`, theValueShouldBe)
 	s.Step(`^there is a callback function that return (\d+)$`, thereIsACallbackFunctionThatReturn)
+
+	s.Step(`^the value should not be nil$`, theValueShouldNotBeNil)
+	s.Step(`^there is a "([^"]*)" sensor$`, thereIsASensor)
 }

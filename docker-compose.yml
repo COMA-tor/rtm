@@ -15,6 +15,9 @@ services:
             - "3000:3000"
         volumes:
             - ./provisioning/datasources:/etc/grafana/provisioning/datasources
-            - ./data:/var/lib/grafana
+            - grafana-storage:/var/lib/grafana
         links: 
             - redis
+
+volumes:
+    grafana-storage:

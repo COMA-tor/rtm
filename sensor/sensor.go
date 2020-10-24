@@ -13,3 +13,7 @@ func (*emptySensor) Value() []byte {
 func NewSensor() Sensor {
 	return new(emptySensor)
 }
+
+func EmptySensor() Sensor {
+	return new(emptySensor)
+}

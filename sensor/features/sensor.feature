@@ -8,3 +8,10 @@ Feature: Sensor value
         Given there is an empty sensor
         When i read the sensor value
         Then the value should be nil
+
+    Scenario: Define sensor value method
+        Given there is an empty sensor
+        And there is a callback function that return 1
+        When the callback function is defined for the sensor
+        And i read the sensor value
+        Then the value should be 1

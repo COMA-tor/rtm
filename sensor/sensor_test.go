@@ -64,6 +64,8 @@ func thereIsASensor(sensorType string) error {
 	switch sensorType {
 	case "temperature":
 		sensor = TemperatureSensor()
+	case "pressure":
+		sensor = PressureSensor()
 	default:
 		return fmt.Errorf("invalid sensor type")
 	}

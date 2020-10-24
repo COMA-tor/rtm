@@ -14,7 +14,7 @@ func temperatureValue() []byte {
 	return []byte(fmt.Sprint(value))
 }
 
-// A TemperatureSensor is a sensor that provides temperature value.
+// TemperatureSensor is a sensor that provides temperature value.
 func TemperatureSensor() Sensor {
 	return WithCustomValue(EmptySensor(), temperatureValue)
 }

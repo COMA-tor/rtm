@@ -9,7 +9,7 @@ import (
 
 // pressureValue returns a radom value generated using Perlin generator.
 func pressureValue() []byte {
-	value := generator.TemperatureGenerator(time.Now().Unix())
+	value := generator.PressureGenerator(time.Now().Unix())
 
 	return []byte(fmt.Sprint(value))
 }

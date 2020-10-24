@@ -1,0 +1,42 @@
+swagger: "2.0"
+info:
+  title: Airport sensor measurements
+  description: A REST api used to get filtered measurements from airport sensors.
+  version: 1.0.0
+definitions:
+  measure:
+    type: object
+    properties:
+      timestamp:
+        type: integer
+      value:
+        type: number
+      unit:
+        type: string
+    required:
+      - timestamp
+      - value
+      - unit
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+paths:
+  /airport/{IATA}/{type}:
+    get:
+      parameters:
+        - name: IATA
+          required: true
+          type: string
+          in: path
+        - name: type
+          required: true
+          type: string
+          in: path
+      responses:
+        200:
+          description: Returns the latest measurement of the given type from the given airport
+          schema:
+            $ref: '#/definitions/measure'

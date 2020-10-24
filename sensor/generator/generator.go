@@ -18,5 +18,5 @@ func PerlinGenerator(octaves int, alpha, beta, min, max, scaling float64) Genera
 }
 
 var TemperatureGenerator GeneratorFunc = PerlinGenerator(4, 2, 3, -5, 25, 60000)
-var HygrometryGenerator GeneratorFunc = PerlinGenerator(4, 2, 3, 0, 100, 60000)
+var WindSpeedGenerator GeneratorFunc = PerlinGenerator(4, 2, 3, 0, 100, 60000)
 var PressureGenerator GeneratorFunc = PerlinGenerator(4, 2, 3, 1000, 1024, 60000)

@@ -20,3 +20,8 @@ Feature: Sensor value
         Given there is a "temperature" sensor
         When i read the sensor value
         Then the value should not be nil
+    
+    Scenario: Read measurement from a pressure sensor
+        Given there is a "pressure" sensor
+        When i read the sensor value
+        Then the value should not be nil

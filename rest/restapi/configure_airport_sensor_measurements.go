@@ -5,9 +5,8 @@ package restapi
 import (
 	"crypto/tls"
 	"github.com/COMA-tor/rtm/rest/models"
-	"net/http"
-
 	rst "github.com/RedisTimeSeries/redistimeseries-go"
+	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
@@ -47,21 +46,66 @@ func configureAPI(api *operations.AirportSensorMeasurementsAPI) http.Handler {
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
 
-	api.GetAirportIATATypeHandler = operations.GetAirportIATATypeHandlerFunc(func(params operations.GetAirportIATATypeParams) middleware.Responder {
+	api.GetAirportIATATypeLastHandler = operations.GetAirportIATATypeLastHandlerFunc(func(params operations.GetAirportIATATypeLastParams) middleware.Responder {
 		point, err := client.Get(params.Type + ":" + params.IATA)
 		if err != nil {
 			return middleware.Error(500, err)
 		}
 		unit := units[params.Type]
-		return operations.NewGetAirportIATATypeOK().WithPayload(&models.Measure{
+		return operations.NewGetAirportIATATypeLastOK().WithPayload(&models.Measure{
 			Timestamp: &point.Timestamp,
 			Value:     &point.Value,
 			Unit:      &unit,
 		})
 	})
 
-	api.PreServerShutdown = func() {}
+	api.GetAirportIATATypeHandler = operations.GetAirportIATATypeHandlerFunc(func(params operations.GetAirportIATATypeParams) middleware.Responder {
+		count := *params.Count
+		if count > 300 {
+			count = 300
+		}
 
+		ranges, err := client.RangeWithOptions(params.Type+":"+params.IATA, rst.TimeRangeMinimum, rst.TimeRangeFull,
+			rst.RangeOptions{
+				AggType:    rst.AvgAggregation,
+				TimeBucket: int(*params.Step),
+				Count:      count,
+			})
+		if err != nil {
+			return middleware.Error(500, err)
+		}
+
+		measures := make([]*models.Measure, len(ranges))
+		unit := units[params.Type]
+		for i, r := range ranges {
+			measures[i] = &models.Measure{
+				Timestamp: &r.Timestamp,
+				Value:     &r.Value,
+				Unit:      &unit,
+			}
+		}
+		return operations.NewGetAirportIATATypeOK().WithPayload(measures)
+	})
+
+	api.GetAirportIATAHandler = operations.GetAirportIATAHandlerFunc(func(params operations.GetAirportIATAParams) middleware.Responder {
+		measures := make([]*models.Measure, len(units))
+		i := 0
+		for k, v := range units {
+			point, err := client.Get(k + ":" + params.IATA)
+			if err != nil {
+				return middleware.Error(500, err)
+			}
+			measures[i] = &models.Measure{
+				Timestamp: &point.Timestamp,
+				Value:     &point.Value,
+				Unit:      &v,
+			}
+			i++
+		}
+		return operations.NewGetAirportIATATypeOK().WithPayload(measures)
+	})
+
+	api.PreServerShutdown = func() {}
 	api.ServerShutdown = func() {}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))

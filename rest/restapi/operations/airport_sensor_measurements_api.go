@@ -42,8 +42,14 @@ func NewAirportSensorMeasurementsAPI(spec *loads.Document) *AirportSensorMeasure
 
 		JSONProducer: runtime.JSONProducer(),
 
+		GetAirportIATAHandler: GetAirportIATAHandlerFunc(func(params GetAirportIATAParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetAirportIATA has not yet been implemented")
+		}),
 		GetAirportIATATypeHandler: GetAirportIATATypeHandlerFunc(func(params GetAirportIATATypeParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetAirportIATAType has not yet been implemented")
+		}),
+		GetAirportIATATypeLastHandler: GetAirportIATATypeLastHandlerFunc(func(params GetAirportIATATypeLastParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetAirportIATATypeLast has not yet been implemented")
 		}),
 	}
 }
@@ -79,8 +85,12 @@ type AirportSensorMeasurementsAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// GetAirportIATAHandler sets the operation handler for the get airport i a t a operation
+	GetAirportIATAHandler GetAirportIATAHandler
 	// GetAirportIATATypeHandler sets the operation handler for the get airport i a t a type operation
 	GetAirportIATATypeHandler GetAirportIATATypeHandler
+	// GetAirportIATATypeLastHandler sets the operation handler for the get airport i a t a type last operation
+	GetAirportIATATypeLastHandler GetAirportIATATypeLastHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -157,8 +167,14 @@ func (o *AirportSensorMeasurementsAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.GetAirportIATAHandler == nil {
+		unregistered = append(unregistered, "GetAirportIATAHandler")
+	}
 	if o.GetAirportIATATypeHandler == nil {
 		unregistered = append(unregistered, "GetAirportIATATypeHandler")
+	}
+	if o.GetAirportIATATypeLastHandler == nil {
+		unregistered = append(unregistered, "GetAirportIATATypeLastHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -251,7 +267,15 @@ func (o *AirportSensorMeasurementsAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/airport/{IATA}"] = NewGetAirportIATA(o.context, o.GetAirportIATAHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/airport/{IATA}/{type}"] = NewGetAirportIATAType(o.context, o.GetAirportIATATypeHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/airport/{IATA}/{type}/last"] = NewGetAirportIATATypeLast(o.context, o.GetAirportIATATypeLastHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

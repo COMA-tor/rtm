@@ -34,7 +34,86 @@ func init() {
     "version": "1.0.0"
   },
   "paths": {
+    "/airport/{IATA}": {
+      "get": {
+        "parameters": [
+          {
+            "type": "string",
+            "name": "IATA",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the latest measurement for each type from the given airport",
+            "schema": {
+              "type": "object",
+              "required": [
+                "temperature",
+                "pressure",
+                "wind_speed"
+              ],
+              "properties": {
+                "pressure": {
+                  "$ref": "#/definitions/measure"
+                },
+                "temperature": {
+                  "$ref": "#/definitions/measure"
+                },
+                "wind_speed": {
+                  "$ref": "#/definitions/measure"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/airport/{IATA}/{type}": {
+      "get": {
+        "parameters": [
+          {
+            "type": "string",
+            "name": "IATA",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "default": 50,
+            "description": "Number of measures to return",
+            "name": "count",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "default": 0,
+            "description": "Time step between measures for aggregation",
+            "name": "step",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an array of the latest measurements of the given type from the given airport",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/measure"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/airport/{IATA}/{type}/last": {
       "get": {
         "parameters": [
           {
@@ -100,7 +179,86 @@ func init() {
     "version": "1.0.0"
   },
   "paths": {
+    "/airport/{IATA}": {
+      "get": {
+        "parameters": [
+          {
+            "type": "string",
+            "name": "IATA",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the latest measurement for each type from the given airport",
+            "schema": {
+              "type": "object",
+              "required": [
+                "temperature",
+                "pressure",
+                "wind_speed"
+              ],
+              "properties": {
+                "pressure": {
+                  "$ref": "#/definitions/measure"
+                },
+                "temperature": {
+                  "$ref": "#/definitions/measure"
+                },
+                "wind_speed": {
+                  "$ref": "#/definitions/measure"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/airport/{IATA}/{type}": {
+      "get": {
+        "parameters": [
+          {
+            "type": "string",
+            "name": "IATA",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "default": 50,
+            "description": "Number of measures to return",
+            "name": "count",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "default": 0,
+            "description": "Time step between measures for aggregation",
+            "name": "step",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an array of the latest measurements of the given type from the given airport",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/measure"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/airport/{IATA}/{type}/last": {
       "get": {
         "parameters": [
           {

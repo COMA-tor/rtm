@@ -10,12 +10,17 @@ import (
 	"net/url"
 	golangswaggerpaths "path"
 	"strings"
+
+	"github.com/go-openapi/swag"
 )
 
 // GetAirportIATATypeURL generates an URL for the get airport i a t a type operation
 type GetAirportIATATypeURL struct {
 	IATA string
 	Type string
+
+	Count *int64
+	Step  *int64
 
 	_basePath string
 	// avoid unkeyed usage
@@ -59,6 +64,26 @@ func (o *GetAirportIATATypeURL) Build() (*url.URL, error) {
 
 	_basePath := o._basePath
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var countQ string
+	if o.Count != nil {
+		countQ = swag.FormatInt64(*o.Count)
+	}
+	if countQ != "" {
+		qs.Set("count", countQ)
+	}
+
+	var stepQ string
+	if o.Step != nil {
+		stepQ = swag.FormatInt64(*o.Step)
+	}
+	if stepQ != "" {
+		qs.Set("step", stepQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }

@@ -24,7 +24,60 @@ produces:
 schemes:
   - http
 paths:
+  /airport/{IATA}:
+    get:
+      parameters:
+        - name: IATA
+          required: true
+          type: string
+          in: path
+      responses:
+        200:
+          description: Returns the latest measurement for each type from the given airport
+          schema:
+            type: object
+            properties:
+              temperature:
+                $ref: '#/definitions/measure'
+              pressure:
+                $ref: '#/definitions/measure'
+              wind_speed:
+                $ref: '#/definitions/measure'
+            required:
+              - temperature
+              - pressure
+              - wind_speed
   /airport/{IATA}/{type}:
+    get:
+      parameters:
+        - name: IATA
+          required: true
+          type: string
+          in: path
+        - name: type
+          required: true
+          type: string
+          in: path
+        - name: count
+          description: Number of measures to return
+          default: 50
+          required: false
+          type: integer
+          in: query
+        - name: step
+          description: Time step between measures for aggregation
+          default: 0
+          required: false
+          type: integer
+          in: query
+      responses:
+        200:
+          description: Returns an array of the latest measurements of the given type from the given airport
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/measure'
+  /airport/{IATA}/{type}/last:
     get:
       parameters:
         - name: IATA

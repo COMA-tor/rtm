@@ -9,15 +9,28 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewGetAirportIATATypeParams creates a new GetAirportIATATypeParams object
-// no default values defined in spec.
+// with the default values initialized.
 func NewGetAirportIATATypeParams() GetAirportIATATypeParams {
 
-	return GetAirportIATATypeParams{}
+	var (
+		// initialize parameters with default values
+
+		countDefault = int64(50)
+		stepDefault  = int64(0)
+	)
+
+	return GetAirportIATATypeParams{
+		Count: &countDefault,
+
+		Step: &stepDefault,
+	}
 }
 
 // GetAirportIATATypeParams contains all the bound params for the get airport i a t a type operation
@@ -34,6 +47,16 @@ type GetAirportIATATypeParams struct {
 	  In: path
 	*/
 	IATA string
+	/*Number of measures to return
+	  In: query
+	  Default: 50
+	*/
+	Count *int64
+	/*Time step between measures for aggregation
+	  In: query
+	  Default: 0
+	*/
+	Step *int64
 	/*
 	  Required: true
 	  In: path
@@ -50,8 +73,20 @@ func (o *GetAirportIATATypeParams) BindRequest(r *http.Request, route *middlewar
 
 	o.HTTPRequest = r
 
+	qs := runtime.Values(r.URL.Query())
+
 	rIATA, rhkIATA, _ := route.Params.GetOK("IATA")
 	if err := o.bindIATA(rIATA, rhkIATA, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qCount, qhkCount, _ := qs.GetOK("count")
+	if err := o.bindCount(qCount, qhkCount, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qStep, qhkStep, _ := qs.GetOK("step")
+	if err := o.bindStep(qStep, qhkStep, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -77,6 +112,52 @@ func (o *GetAirportIATATypeParams) bindIATA(rawData []string, hasKey bool, forma
 	// Parameter is provided by construction from the route
 
 	o.IATA = raw
+
+	return nil
+}
+
+// bindCount binds and validates parameter Count from query.
+func (o *GetAirportIATATypeParams) bindCount(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		// Default values have been previously initialized by NewGetAirportIATATypeParams()
+		return nil
+	}
+
+	value, err := swag.ConvertInt64(raw)
+	if err != nil {
+		return errors.InvalidType("count", "query", "int64", raw)
+	}
+	o.Count = &value
+
+	return nil
+}
+
+// bindStep binds and validates parameter Step from query.
+func (o *GetAirportIATATypeParams) bindStep(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		// Default values have been previously initialized by NewGetAirportIATATypeParams()
+		return nil
+	}
+
+	value, err := swag.ConvertInt64(raw)
+	if err != nil {
+		return errors.InvalidType("step", "query", "int64", raw)
+	}
+	o.Step = &value
 
 	return nil
 }

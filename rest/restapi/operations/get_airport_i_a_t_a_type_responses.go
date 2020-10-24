@@ -16,7 +16,7 @@ import (
 // GetAirportIATATypeOKCode is the HTTP code returned for type GetAirportIATATypeOK
 const GetAirportIATATypeOKCode int = 200
 
-/*GetAirportIATATypeOK Returns the latest measurement of the given type from the given airport
+/*GetAirportIATATypeOK Returns an array of the latest measurements of the given type from the given airport
 
 swagger:response getAirportIATATypeOK
 */
@@ -25,7 +25,7 @@ type GetAirportIATATypeOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.Measure `json:"body,omitempty"`
+	Payload []*models.Measure `json:"body,omitempty"`
 }
 
 // NewGetAirportIATATypeOK creates GetAirportIATATypeOK with default headers values
@@ -35,13 +35,13 @@ func NewGetAirportIATATypeOK() *GetAirportIATATypeOK {
 }
 
 // WithPayload adds the payload to the get airport i a t a type o k response
-func (o *GetAirportIATATypeOK) WithPayload(payload *models.Measure) *GetAirportIATATypeOK {
+func (o *GetAirportIATATypeOK) WithPayload(payload []*models.Measure) *GetAirportIATATypeOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get airport i a t a type o k response
-func (o *GetAirportIATATypeOK) SetPayload(payload *models.Measure) {
+func (o *GetAirportIATATypeOK) SetPayload(payload []*models.Measure) {
 	o.Payload = payload
 }
 
@@ -49,10 +49,13 @@ func (o *GetAirportIATATypeOK) SetPayload(payload *models.Measure) {
 func (o *GetAirportIATATypeOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
-	if o.Payload != nil {
-		payload := o.Payload
-		if err := producer.Produce(rw, payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
+	payload := o.Payload
+	if payload == nil {
+		// return empty array
+		payload = make([]*models.Measure, 0, 50)
+	}
+
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
 	}
 }

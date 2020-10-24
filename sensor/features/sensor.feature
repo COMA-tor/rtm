@@ -25,3 +25,8 @@ Feature: Sensor value
         Given there is a "pressure" sensor
         When i read the sensor value
         Then the value should not be nil
+    
+    Scenario: Read measurement from a wind speed sensor
+        Given there is a "wind speed" sensor
+        When i read the sensor value
+        Then the value should not be nil

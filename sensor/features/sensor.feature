@@ -15,3 +15,8 @@ Feature: Sensor value
         When the callback function is defined for the sensor
         And i read the sensor value
         Then the value should be 1
+
+    Scenario: Read measurement from a temperature sensor
+        Given there is a "temperature" sensor
+        When i read the sensor value
+        Then the value should nor be nil

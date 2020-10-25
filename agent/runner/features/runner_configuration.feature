@@ -5,4 +5,4 @@ Feature: Agent configuration
     I need to be able to configure it
 
     # Scenario: Use command line arguments
-    #     Given there  
+    #     Given there 

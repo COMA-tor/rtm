@@ -18,7 +18,8 @@ import (
 type configuration struct {
 	tickInterval time.Duration
 	// sensorType   string
-	// airportIATA  string
+	topic      string
+	qos        int
 	brokerHost string
 	brokerPort string
 	clientID   string
@@ -28,6 +29,8 @@ const defaultTick = 10 * time.Second
 const defaultClientID = ""
 const defaultBrokerHost = "localhost"
 const defaultBorkerPort = "1883"
+const defaultTopic = "test"
+const defaultQos = 0
 
 func (config *configuration) init(args []string) error {
 	flags := flag.NewFlagSet(args[0], flag.ExitOnError)
@@ -35,6 +38,8 @@ func (config *configuration) init(args []string) error {
 
 	var (
 		tickInterval = flags.Duration("tick_interval", defaultTick, "Interval between two measurements")
+		topic        = flags.String("topic", defaultTopic, "Topic where data should go")
+		qos          = flags.Int("qos", defaultQos, "Quality Of Service for that agent")
 		clientID     = flags.String("client_id", defaultClientID, "ID of the current agent")
 		brokerHost   = flags.String("broker_host", defaultBrokerHost, "Host address of the broker")
 		brokerPort   = flags.String("broker_port", defaultBorkerPort, "Port of the broker")
@@ -45,6 +50,8 @@ func (config *configuration) init(args []string) error {
 	}
 
 	config.tickInterval = *tickInterval
+	config.topic = *topic
+	config.qos = *qos
 	config.clientID = *clientID
 	config.brokerHost = *brokerHost
 	config.brokerPort = *brokerPort
@@ -111,12 +118,12 @@ func run(ctx context.Context, config *configuration, out io.Writer) error {
 
 	sensor := sensor.NewSensor()
 
-	mqtt_agent := agent.WithSensor(agent.EmptyAgent(), sensor, func(bytes []byte) {
-		log.Println(string(bytes))
-		client.Publish("test", 1, false, bytes)
+	mqttAgent := agent.WithSensor(agent.EmptyAgent(), sensor, func(bytes []byte) {
+		log.Println(string(bytes), config.topic, config.qos)
+		client.Publish(config.topic, byte(config.qos), false, bytes)
 	}, time.Second)
 
-	mqtt_agent.Run()
+	mqttAgent.Run(ctx)
 
 	return nil
 }

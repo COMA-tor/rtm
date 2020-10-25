@@ -16,35 +16,35 @@ func (*emptyAgent) Run() error {
 	return nil
 }
 
-func NewAgent() Agent {
+func EmptyAgent() Agent {
 	return new(emptyAgent)
 }
 
-type DefaultAgent struct {
-	businessFunction func()
+type MeasurementHandler func([]byte)
+
+type sensorAgent struct {
+	Agent
+	sensor            sensor.Sensor
+	handleMeasurement MeasurementHandler
+	tickInterval      time.Duration
 }
 
-func (agent *DefaultAgent) Run() error {
+func (s sensorAgent) Run() error {
 	for {
 		select {
-		case <-time.Tick(time.Second):
-			agent.businessFunction()
+		case <-time.Tick(s.tickInterval):
+			measurement := s.sensor.Value()
+			s.handleMeasurement(measurement)
 		}
 	}
+
+	return nil
 }
 
-func WithHandler(agent Agent, handler func()) Agent {
-	return &DefaultAgent{businessFunction: handler}
+func WithSensor(agent Agent, sensor sensor.Sensor, measurementHandler MeasurementHandler, tickInterval time.Duration) Agent {
+	return newSensorAgent(agent, sensor, measurementHandler, tickInterval)
 }
 
-type MeasurementAgent struct {
-	DefaultAgent
-}
-
-func NewMeasurementAgent(sensor sensor.Sensor, measurementHandler func([]byte)) Agent {
-	agent := WithHandler(NewAgent(), func() {
-		value := sensor.Value()
-		measurementHandler(value)
-	})
-	return agent
+func newSensorAgent(agent Agent, sensor sensor.Sensor, measurementHandler MeasurementHandler, tickInterval time.Duration) sensorAgent {
+	return sensorAgent{Agent: agent, sensor: sensor, handleMeasurement: measurementHandler, tickInterval: tickInterval}
 }

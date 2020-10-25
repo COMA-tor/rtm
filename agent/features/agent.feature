@@ -10,3 +10,4 @@ Feature: Collect measurements
         And there is an agent that use it
         When I run the agent for 45 milliseconds
         Then there should be 4 measurements collected
+        And no more should be collected

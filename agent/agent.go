@@ -1,18 +1,19 @@
 package agent
 
 import (
+	"context"
 	"time"
 
 	"github.com/COMA-tor/rtm/sensor"
 )
 
 type Agent interface {
-	Run() error
+	Run(context.Context) error
 }
 
 type emptyAgent int
 
-func (*emptyAgent) Run() error {
+func (*emptyAgent) Run(context.Context) error {
 	return nil
 }
 
@@ -29,9 +30,11 @@ type sensorAgent struct {
 	tickInterval      time.Duration
 }
 
-func (s sensorAgent) Run() error {
+func (s *sensorAgent) Run(ctx context.Context) error {
 	for {
 		select {
+		case <-ctx.Done():
+			return nil
 		case <-time.Tick(s.tickInterval):
 			measurement := s.sensor.Value()
 			s.handleMeasurement(measurement)
@@ -42,7 +45,8 @@ func (s sensorAgent) Run() error {
 }
 
 func WithSensor(agent Agent, sensor sensor.Sensor, measurementHandler MeasurementHandler, tickInterval time.Duration) Agent {
-	return newSensorAgent(agent, sensor, measurementHandler, tickInterval)
+	s := newSensorAgent(agent, sensor, measurementHandler, tickInterval)
+	return &s
 }
 
 func newSensorAgent(agent Agent, sensor sensor.Sensor, measurementHandler MeasurementHandler, tickInterval time.Duration) sensorAgent {

@@ -1,18 +1,22 @@
 package agent
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/COMA-tor/rtm/sensor"
 	"github.com/cucumber/godog"
+	"github.com/cucumber/messages-go/v10"
 )
 
 var (
+	ctx                 context.Context
 	agent               Agent
 	sensorFeature       sensor.Sensor
 	measurements        [][]byte
 	measurementInterval time.Duration
+	measurementsCount   int
 )
 
 func iRunAnAgentThatUseIt() error {
@@ -20,12 +24,15 @@ func iRunAnAgentThatUseIt() error {
 }
 
 func iRunTheAgentForMilliseconds(expectedRunDuration int) error {
-	go agent.Run()
+	ctx, _ := context.WithTimeout(ctx, time.Duration(expectedRunDuration)*time.Millisecond)
 
-	select {
-	case <-time.After(time.Duration(expectedRunDuration) * time.Millisecond):
-		return nil
-	}
+	agent.Run(ctx)
+
+	return nil
+	// select {
+	// case <-time.After(time.Duration(expectedRunDuration) * time.Millisecond):
+	// 	return nil
+	// }
 }
 
 func thereIsASensor() error {
@@ -46,6 +53,8 @@ func thereShouldBeMeasurementsCollected(expectedMeasurementsCount int) error {
 		return fmt.Errorf("expected %v measurements, got %v", expectedMeasurementsCount, len(measurements))
 	}
 
+	measurementsCount = expectedMeasurementsCount
+
 	return nil
 }
 
@@ -54,11 +63,32 @@ func thereIsAMeasurementIntervalOfMilliseconds(expectedInterval int) error {
 	return nil
 }
 
+func noMoreShouldBeCollected() error {
+	select {
+	case <-time.After(time.Second):
+		if measurementsCount != len(measurements) {
+			return fmt.Errorf("expected %v measurements, got %v", measurementsCount, len(measurements))
+		}
+	}
+
+	return nil
+}
+
 func FeatureContext(s *godog.Suite) {
+	s.BeforeScenario(func(m *messages.Pickle) {
+		ctx = context.Background()
+		agent = EmptyAgent()
+		sensorFeature = sensor.NewSensor()
+		measurements = make([][]byte, 0)
+		measurementInterval = time.Second
+
+	})
+
 	s.Step(`^I run an agent that use it$`, iRunAnAgentThatUseIt)
 	s.Step(`^I run the agent for (\d+) milliseconds$`, iRunTheAgentForMilliseconds)
 	s.Step(`^there is a sensor$`, thereIsASensor)
 	s.Step(`^there is an agent that use it$`, thereIsAnAgentThatUseIt)
 	s.Step(`^there should be (\d+) measurements collected$`, thereShouldBeMeasurementsCollected)
 	s.Step(`^there is a measurement interval of (\d+) milliseconds$`, thereIsAMeasurementIntervalOfMilliseconds)
+	s.Step(`^no more should be collected$`, noMoreShouldBeCollected)
 }

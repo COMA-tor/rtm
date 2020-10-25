@@ -19,24 +19,13 @@ var (
 	measurementsCount   int
 )
 
-func iRunAnAgentThatUseIt() error {
-	return godog.ErrPending
-}
-
-func iRunTheAgentForMilliseconds(expectedRunDuration int) error {
-	ctx, _ := context.WithTimeout(ctx, time.Duration(expectedRunDuration)*time.Millisecond)
-
-	agent.Run(ctx)
-
-	return nil
-	// select {
-	// case <-time.After(time.Duration(expectedRunDuration) * time.Millisecond):
-	// 	return nil
-	// }
-}
-
 func thereIsASensor() error {
 	sensorFeature = sensor.NewSensor()
+	return nil
+}
+
+func thereIsAMeasurementIntervalOfMilliseconds(expectedInterval int) error {
+	measurementInterval = time.Duration(expectedInterval) * time.Millisecond
 	return nil
 }
 
@@ -48,6 +37,14 @@ func thereIsAnAgentThatUseIt() error {
 	return nil
 }
 
+func iRunTheAgentForMilliseconds(expectedRunDuration int) error {
+	ctx, _ := context.WithTimeout(ctx, time.Duration(expectedRunDuration)*time.Millisecond)
+
+	agent.Run(ctx)
+
+	return nil
+}
+
 func thereShouldBeMeasurementsCollected(expectedMeasurementsCount int) error {
 	if len(measurements) != expectedMeasurementsCount {
 		return fmt.Errorf("expected %v measurements, got %v", expectedMeasurementsCount, len(measurements))
@@ -55,11 +52,6 @@ func thereShouldBeMeasurementsCollected(expectedMeasurementsCount int) error {
 
 	measurementsCount = expectedMeasurementsCount
 
-	return nil
-}
-
-func thereIsAMeasurementIntervalOfMilliseconds(expectedInterval int) error {
-	measurementInterval = time.Duration(expectedInterval) * time.Millisecond
 	return nil
 }
 
@@ -84,11 +76,12 @@ func FeatureContext(s *godog.Suite) {
 
 	})
 
-	s.Step(`^I run an agent that use it$`, iRunAnAgentThatUseIt)
-	s.Step(`^I run the agent for (\d+) milliseconds$`, iRunTheAgentForMilliseconds)
 	s.Step(`^there is a sensor$`, thereIsASensor)
-	s.Step(`^there is an agent that use it$`, thereIsAnAgentThatUseIt)
-	s.Step(`^there should be (\d+) measurements collected$`, thereShouldBeMeasurementsCollected)
 	s.Step(`^there is a measurement interval of (\d+) milliseconds$`, thereIsAMeasurementIntervalOfMilliseconds)
+	s.Step(`^there is an agent that use it$`, thereIsAnAgentThatUseIt)
+
+	s.Step(`^I run the agent for (\d+) milliseconds$`, iRunTheAgentForMilliseconds)
+
+	s.Step(`^there should be (\d+) measurements collected$`, thereShouldBeMeasurementsCollected)
 	s.Step(`^no more should be collected$`, noMoreShouldBeCollected)
 }

@@ -34,6 +34,8 @@ const defaultBorkerPort = "1883"
 const defaultTopic = "test"
 const defaultQos = 0
 
+var reload = make(chan int, 1)
+
 func (config *configuration) init(args []string) error {
 	flags := flag.NewFlagSet(args[0], flag.ExitOnError)
 
@@ -90,6 +92,7 @@ func main() {
 				case syscall.SIGHUP:
 					log.Println("Reload configuration")
 					config.init(os.Args)
+					reload <- 1
 				}
 			case <-ctx.Done():
 				log.Println("Done")
@@ -109,12 +112,10 @@ func run(ctx context.Context, config *configuration, out io.Writer) error {
 
 	log.SetOutput(out)
 
-	options := mqtt.NewClientOptions().SetClientID(config.clientID).AddBroker(config.brokerHost + ":" + config.brokerPort)
+	client, err := initClient(config)
 
-	client := mqtt.NewClient(options)
-
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return token.Error()
+	if err != nil {
+		return err
 	}
 
 	defer func() {
@@ -128,7 +129,27 @@ func run(ctx context.Context, config *configuration, out io.Writer) error {
 		client.Publish(config.topic, byte(config.qos), false, bytes)
 	}, time.Second)
 
-	mqttAgent.Run(ctx)
+	go mqttAgent.Run(ctx)
 
-	return nil
+	for {
+		select {
+		case <-reload:
+			client, err = initClient(config)
+			if err != nil {
+				return err
+			}
+		}
+	}
+}
+
+func initClient(config *configuration) (mqtt.Client, error) {
+	options := mqtt.NewClientOptions().SetClientID(config.clientID).AddBroker(config.brokerHost + ":" + config.brokerPort)
+
+	client := mqtt.NewClient(options)
+
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		return nil, token.Error()
+	}
+
+	return client, nil
 }

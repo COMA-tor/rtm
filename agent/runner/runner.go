@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"io"
 	"log"
 	"os"
@@ -12,7 +13,7 @@ import (
 	"github.com/COMA-tor/rtm/agent"
 	"github.com/COMA-tor/rtm/sensor"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/namsral/flag"
+	"github.com/peterbourgon/ff/v3"
 )
 
 type configuration struct {
@@ -34,7 +35,6 @@ const defaultQos = 0
 
 func (config *configuration) init(args []string) error {
 	flags := flag.NewFlagSet(args[0], flag.ExitOnError)
-	flags.String(flag.DefaultConfigFlagname, "", "Path to config file")
 
 	var (
 		tickInterval = flags.Duration("tick_interval", defaultTick, "Interval between two measurements")
@@ -43,9 +43,13 @@ func (config *configuration) init(args []string) error {
 		clientID     = flags.String("client_id", defaultClientID, "ID of the current agent")
 		brokerHost   = flags.String("broker_host", defaultBrokerHost, "Host address of the broker")
 		brokerPort   = flags.String("broker_port", defaultBorkerPort, "Port of the broker")
+		_            = flags.String("config", "", "config file (optional)")
 	)
 
-	if err := flags.Parse(args[1:]); err != nil {
+	if err := ff.Parse(flags, args[1:],
+		ff.WithEnvVarPrefix("RUNNER"),
+		ff.WithConfigFileFlag("config"),
+		ff.WithConfigFileParser(ff.PlainParser)); err != nil {
 		return err
 	}
 

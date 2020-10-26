@@ -14,6 +14,7 @@ import (
 	"github.com/COMA-tor/rtm/sensor"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/peterbourgon/ff/v3"
+	"github.com/peterbourgon/ff/v3/ffyaml"
 )
 
 type configuration struct {
@@ -47,9 +48,9 @@ func (config *configuration) init(args []string) error {
 	)
 
 	if err := ff.Parse(flags, args[1:],
-		ff.WithEnvVarPrefix("RUNNER"),
+		ff.WithEnvVarNoPrefix(),
 		ff.WithConfigFileFlag("config"),
-		ff.WithConfigFileParser(ff.PlainParser)); err != nil {
+		ff.WithConfigFileParser(ffyaml.Parser)); err != nil {
 		return err
 	}
 

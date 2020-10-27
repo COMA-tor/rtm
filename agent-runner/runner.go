@@ -135,9 +135,9 @@ func run(ctx context.Context, config *configuration, out io.Writer) error {
 
 	mqttAgent := agent.WithSensor(agent.EmptyAgent(), sensor, func(bytes []byte) {
 		value, _ := strconv.ParseFloat(string(bytes), 64)
-		measurement := data.ValuesToByte(time.Now().Unix(), value, config.sensorUnit)
+		measurement := data.ValuesToByte(time.Now().Unix()*1000, value, config.sensorUnit)
 		client.Publish(config.topic, byte(config.qos), false, measurement)
-	}, time.Second)
+	}, config.tickInterval)
 
 	go mqttAgent.Run(ctx)
 

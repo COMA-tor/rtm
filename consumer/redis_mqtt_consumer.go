@@ -3,27 +3,30 @@ package consumer
 import (
 	"errors"
 	"fmt"
-	"github.com/COMA-tor/rtm/data"
-	redistimeseries "github.com/RedisTimeSeries/redistimeseries-go"
 	"log"
 	"strings"
+
+	"github.com/COMA-tor/rtm/data"
+	redistimeseries "github.com/RedisTimeSeries/redistimeseries-go"
 )
 
 type AirportData struct {
-	IataCode string
+	IataCode        string
 	MeasurementType string
-	Timestamp int64
-	Measure float64
+	Timestamp       int64
+	Measure         float64
 }
 
 type MqttToRedisConsumer struct {
 	MqttConsumer
 }
 
-func NewMqttToRedisConsumer(redisHost string, redisPort string, clientName string) MqttToRedisConsumer {
+func NewMqttToRedisConsumer(redisHost string, redisPort string, brokerHost string, brokerPort string, clientName string) MqttToRedisConsumer {
 	return MqttToRedisConsumer{
 		MqttConsumer: NewMqttConsumer(
 			"/airport/#",
+			brokerHost,
+			brokerPort,
 			newDataToRedisHandler(redisHost, redisPort, clientName),
 		),
 	}
@@ -31,9 +34,10 @@ func NewMqttToRedisConsumer(redisHost string, redisPort string, clientName strin
 
 func newDataToRedisHandler(redisHost string, redisPort string, clientName string) func(bytes []byte) {
 	client := redistimeseries.NewClient(fmt.Sprintf("%s:%v", redisHost, redisPort), clientName, nil)
+
 	return func(bytes []byte) {
 		data := getDataFromBytes(bytes)
-		keyname := data.MeasurementType + ":" + data.IataCode
+		keyname := strings.TrimSpace(data.MeasurementType) + ":" + data.IataCode
 
 		createRuleIfNotExists(client, keyname)
 
@@ -45,7 +49,7 @@ func newDataToRedisHandler(redisHost string, redisPort string, clientName string
 func getDataFromBytes(bytes []byte) AirportData {
 
 	dataStr := string(bytes)
-	data := strings.SplitAfter(dataStr," ")
+	data := strings.SplitAfterN(dataStr, " ", 2)
 
 	if len(data) != 2 {
 		log.Fatal(
@@ -59,10 +63,10 @@ func getDataFromBytes(bytes []byte) AirportData {
 	timestamp, measure, _ := getDataFromPayload([]byte(payload))
 
 	return AirportData{
-		IataCode: iataCode,
+		IataCode:        iataCode,
 		MeasurementType: measurementType,
-		Timestamp: timestamp,
-		Measure: measure,
+		Timestamp:       timestamp,
+		Measure:         measure,
 	}
 }
 

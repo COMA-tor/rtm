@@ -1,13 +1,16 @@
 package main
 
 import (
-	"github.com/COMA-tor/rtm/consumer"
 	"log"
+
+	"github.com/COMA-tor/rtm/consumer"
 )
 
 func main() {
 	mqttConsumer := consumer.NewMqttConsumer(
 		"airport/#",
+		"localhost",
+		"1883",
 		func(bytes []byte) {
 			log.Printf("Data received: %v", bytes)
 		},

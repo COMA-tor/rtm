@@ -11,6 +11,7 @@ docker-compose up -d
 This command start two containers:
 - Redis that store data (measurements and iata codes)
 - Grafana that allow data-visualization on `localhost:3000`
+- Mosquitto that run an MQTT broker that can be used with runners
 
 ### Install and launch agent runner
 

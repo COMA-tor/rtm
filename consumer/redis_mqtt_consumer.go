@@ -33,10 +33,11 @@ func NewMqttToRedisConsumer(redisHost string, redisPort string, brokerHost strin
 }
 
 func newDataToRedisHandler(redisHost string, redisPort string, clientName string) func(bytes []byte) {
-	client := redistimeseries.NewClient(fmt.Sprintf("%s:%v", redisHost, redisPort), clientName, nil)
+	client := redistimeseries.NewClient(fmt.Sprintf("%s:%v", redisHost, redisPort), "nohelp", nil)
+
 	return func(bytes []byte) {
 		data := getDataFromBytes(bytes)
-		keyname := data.MeasurementType + ":" + data.IataCode
+		keyname := strings.TrimSpace(data.MeasurementType) + ":" + data.IataCode
 
 		createRuleIfNotExists(client, keyname)
 
@@ -48,7 +49,7 @@ func newDataToRedisHandler(redisHost string, redisPort string, clientName string
 func getDataFromBytes(bytes []byte) AirportData {
 
 	dataStr := string(bytes)
-	data := strings.SplitAfter(dataStr, " ")
+	data := strings.SplitAfterN(dataStr, " ", 2)
 
 	if len(data) != 2 {
 		log.Fatal(

@@ -48,7 +48,7 @@ func topicAndDataToBytes(topic string, payload []byte) []byte {
 		fmt.Sprintf(
 			"%s %v",
 			topic,
-			payload,
+			string(payload),
 		),
 	)
 }

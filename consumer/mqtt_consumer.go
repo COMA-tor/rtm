@@ -45,7 +45,7 @@ func NewMqttConsumer(topic string, handleData func(bytes []byte)) MqttConsumer {
 func topicAndDataToBytes(topic string, payload []byte) []byte {
 	return []byte(
 		fmt.Sprintf(
-			"%s</payload>%v",
+			"%s %v",
 			topic,
 			payload,
 		),

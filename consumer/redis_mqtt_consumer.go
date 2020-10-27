@@ -44,7 +44,7 @@ func newDataToRedisHandler(redisHost string, redisPort string, clientName string
 func getDataFromBytes(bytes []byte) AirportData {
 
 	dataStr := string(bytes)
-	data := strings.Split(dataStr, "</payload>")
+	data := strings.SplitAfter(dataStr," ")
 
 	if len(data) != 2 {
 		log.Fatal(
@@ -53,7 +53,6 @@ func getDataFromBytes(bytes []byte) AirportData {
 	}
 
 	topic, payload := data[0], data[1]
-	log.Printf("Get from MQTT: %v [%v]", topic, payload)
 
 	iataCode, measurementType := getDataFromTopic(topic)
 	timestamp, measure := getDataFromPayload([]byte(payload))

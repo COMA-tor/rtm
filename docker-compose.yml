@@ -4,10 +4,6 @@ services:
         image: redislabs/redistimeseries
         ports: 
             - "6379:6379"
-        volumes:
-            - redis-storage:/data
-        #     - ./dump.rdb:/data/dump.rdb
-        entrypoint: redis-server --appendonly yes
         restart: always
     
     grafana:
@@ -32,5 +28,4 @@ services:
             - redis
 
 volumes:
-    redis-storage:
     grafana-storage:

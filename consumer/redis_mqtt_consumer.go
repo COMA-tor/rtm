@@ -33,7 +33,7 @@ func NewMqttToRedisConsumer(redisHost string, redisPort string, brokerHost strin
 }
 
 func newDataToRedisHandler(redisHost string, redisPort string, clientName string) func(bytes []byte) {
-	client := redistimeseries.NewClient(fmt.Sprintf("%s:%v", redisHost, redisPort), "nohelp", nil)
+	client := redistimeseries.NewClient(fmt.Sprintf("%s:%v", redisHost, redisPort), clientName, nil)
 
 	return func(bytes []byte) {
 		data := getDataFromBytes(bytes)

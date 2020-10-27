@@ -25,7 +25,7 @@ type configuration struct {
 
 const defaultClientID = ""
 const defaultBrokerHost = "localhost"
-const defaultBorkerPort = "1883"
+const defaultBrokerPort = "1883"
 const defaultRedisHost = "localhost"
 const defaultRedisPort = "6379"
 
@@ -38,9 +38,9 @@ func (config *configuration) init(args []string) error {
 		// qos          = flags.Int("qos", defaultQos, "Quality Of Service for that agent")
 		clientID   = flags.String("client_id", defaultClientID, "ID of the current agent")
 		brokerHost = flags.String("broker_host", defaultBrokerHost, "Host address of the broker")
-		brokerPort = flags.String("broker_port", defaultBorkerPort, "Port of the broker")
+		brokerPort = flags.String("broker_port", defaultBrokerPort, "Port of the broker")
 		redisHost  = flags.String("redis_host", defaultBrokerHost, "Host address of the broker")
-		redisPort  = flags.String("redis_port", defaultBorkerPort, "Port of the broker")
+		redisPort  = flags.String("redis_port", defaultRedisPort, "Port of the broker")
 		_          = flags.String("config", "", "config file (optional)")
 	)
 

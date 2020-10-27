@@ -13,6 +13,25 @@ This command start two containers:
 - Grafana that allow data-visualization on `localhost:3000`
 - Mosquitto that run an MQTT broker that can be used with runners
 
+### Install and launch consumer runner
+
+The consumer runner allows to listen mqtt broker and save measurement. 
+
+Install it by using this command: 
+
+```sh
+go get github.com/COMA-tor/rtm/consumer-runner
+go install github.com/COMA-tor/rtm/consumer-runner
+```
+
+Now the runner is installed and can be used directly in the cli.
+
+```sh
+consumer-runner -help
+```
+
+> The runner directly output in stderr.
+
 ### Install and launch agent runner
 
 The agent runner allows to run a measurement agent directly in the cli. 
@@ -20,14 +39,14 @@ The agent runner allows to run a measurement agent directly in the cli.
 Install it by using this command: 
 
 ```sh
-go get github.com/COMA-tor/rtm/agent/runner
-go install github.com/COMA-tor/rtm/agent/runner
+go get github.com/COMA-tor/rtm/agent-runner
+go install github.com/COMA-tor/rtm/agent-runner
 ```
 
 Now the runner is installed and can be used directly in the cli.
 
 ```sh
-runner -help
+agent-runner -help
 ```
 
 > The runner directly output in stderr.

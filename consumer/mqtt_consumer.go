@@ -1,6 +1,7 @@
 package consumer
 
 import (
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 	"time"
@@ -11,7 +12,7 @@ type MqttConsumer struct {
 	client mqtt.Client
 }
 
-func NewMqttConsumer(handleData func(bytes []byte)) MqttConsumer {
+func NewMqttConsumer(topic string, handleData func(bytes []byte)) MqttConsumer {
 	log.Printf("Trying to connect (%s, %s)", brokerHost, brokerPort)
 
 	opts := mqtt.NewClientOptions()
@@ -30,8 +31,8 @@ func NewMqttConsumer(handleData func(bytes []byte)) MqttConsumer {
 		DefaultConsumer: DefaultConsumer{
 			listenData: func() <-chan []byte {
 				out := make(chan []byte)
-				client.Subscribe("test", 0, func(client mqtt.Client, message mqtt.Message) {
-					out <- message.Payload()
+				client.Subscribe(topic, 0, func(client mqtt.Client, message mqtt.Message) {
+					out <- topicAndDataToBytes(message.Topic(), message.Payload())
 				})
 				return out
 			},
@@ -39,4 +40,14 @@ func NewMqttConsumer(handleData func(bytes []byte)) MqttConsumer {
 		},
 		client: client,
 	}
+}
+
+func topicAndDataToBytes(topic string, payload []byte) []byte {
+	return []byte(
+		fmt.Sprintf(
+			"%s %v",
+			topic,
+			payload,
+		),
+	)
 }

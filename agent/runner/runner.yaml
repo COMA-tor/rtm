@@ -3,3 +3,5 @@ broker_port: 1883
 client_id: test
 topic: test
 qos: 256
+sensor_type: wind speed
+sensor_unit: °C

@@ -7,10 +7,12 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/COMA-tor/rtm/agent"
+	"github.com/COMA-tor/rtm/data"
 	"github.com/COMA-tor/rtm/sensor"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/peterbourgon/ff/v3"
@@ -19,12 +21,13 @@ import (
 
 type configuration struct {
 	tickInterval time.Duration
-	// sensorType   string
-	topic      string
-	qos        int
-	brokerHost string
-	brokerPort string
-	clientID   string
+	sensorType   string
+	sensorUnit   string
+	topic        string
+	qos          int
+	brokerHost   string
+	brokerPort   string
+	clientID     string
 }
 
 const defaultTick = 10 * time.Second
@@ -32,6 +35,8 @@ const defaultClientID = ""
 const defaultBrokerHost = "localhost"
 const defaultBorkerPort = "1883"
 const defaultTopic = "test"
+const defaultSensorType = "temperature"
+const defaultSensorUnit = "°C"
 const defaultQos = 0
 
 var reload = make(chan int, 1)
@@ -41,6 +46,8 @@ func (config *configuration) init(args []string) error {
 
 	var (
 		tickInterval = flags.Duration("tick_interval", defaultTick, "Interval between two measurements")
+		sensorType   = flags.String("sensor_type", defaultSensorType, "Sensor type to run")
+		sensorUnit   = flags.String("sensor_unit", defaultSensorType, "Sensor measurement unit")
 		topic        = flags.String("topic", defaultTopic, "Topic where data should go")
 		qos          = flags.Int("qos", defaultQos, "Quality Of Service for that agent")
 		clientID     = flags.String("client_id", defaultClientID, "ID of the current agent")
@@ -58,6 +65,8 @@ func (config *configuration) init(args []string) error {
 
 	config.tickInterval = *tickInterval
 	config.topic = *topic
+	config.sensorType = *sensorType
+	config.sensorUnit = *sensorUnit
 	config.qos = *qos
 	config.clientID = *clientID
 	config.brokerHost = *brokerHost
@@ -122,11 +131,12 @@ func run(ctx context.Context, config *configuration, out io.Writer) error {
 		client.Disconnect(250)
 	}()
 
-	sensor := sensor.NewSensor()
+	sensor := initSensor(config)
 
 	mqttAgent := agent.WithSensor(agent.EmptyAgent(), sensor, func(bytes []byte) {
-		log.Println(string(bytes), config.topic, config.qos)
-		client.Publish(config.topic, byte(config.qos), false, bytes)
+		value, _ := strconv.ParseFloat(string(bytes), 64)
+		measurement := data.ValuesToByte(time.Now().Unix(), value, config.sensorUnit)
+		client.Publish(config.topic, byte(config.qos), false, measurement)
 	}, time.Second)
 
 	go mqttAgent.Run(ctx)
@@ -134,6 +144,8 @@ func run(ctx context.Context, config *configuration, out io.Writer) error {
 	for {
 		select {
 		case <-reload:
+			client.Disconnect(250)
+
 			client, err = initClient(config)
 			if err != nil {
 				return err
@@ -152,4 +164,17 @@ func initClient(config *configuration) (mqtt.Client, error) {
 	}
 
 	return client, nil
+}
+
+func initSensor(config *configuration) sensor.Sensor {
+	switch config.sensorType {
+	case "wind speed":
+		return sensor.WindSpeedSensor()
+	case "pressure":
+		return sensor.PressureSensor()
+	case "temperature":
+		return sensor.TemperatureSensor()
+	}
+
+	return sensor.NewSensor()
 }

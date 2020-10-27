@@ -40,8 +40,6 @@ func (s *sensorAgent) Run(ctx context.Context) error {
 			s.handleMeasurement(measurement)
 		}
 	}
-
-	return nil
 }
 
 func WithSensor(agent Agent, sensor sensor.Sensor, measurementHandler MeasurementHandler, tickInterval time.Duration) Agent {

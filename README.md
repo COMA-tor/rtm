@@ -12,7 +12,7 @@ This command start two containers:
 - Redis that store data (measurements and iata codes)
 - Grafana that allow data-visualization on `localhost:3000`
 
-### Install and launcn agent runner
+### Install and launch agent runner
 
 The agent runner allows to run a measurement agent directly in the cli. 
 
@@ -44,6 +44,16 @@ sensor_type: wind speed
 sensor_unit: °C
 ```
 
+> For now, `sensor_unit` is not used.
+
+### Sensors
+
+There is three sensor types:
+- `temperature`
+- `wind speed`
+- `pressure`
+
 ## Possible improvements
 
 - Handle reload signals in agent runner to reload the sensor and the agent
+- Use `sensor_unit` in order to apply some computation and unify data

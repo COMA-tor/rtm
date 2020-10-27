@@ -3,6 +3,7 @@ package consumer
 import (
 	"errors"
 	"fmt"
+	"github.com/COMA-tor/rtm/data"
 	redistimeseries "github.com/RedisTimeSeries/redistimeseries-go"
 	"log"
 	"strings"
@@ -55,7 +56,7 @@ func getDataFromBytes(bytes []byte) AirportData {
 	topic, payload := data[0], data[1]
 
 	iataCode, measurementType := getDataFromTopic(topic)
-	timestamp, measure := getDataFromPayload([]byte(payload))
+	timestamp, measure, _ := getDataFromPayload([]byte(payload))
 
 	return AirportData{
 		IataCode: iataCode,
@@ -65,8 +66,8 @@ func getDataFromBytes(bytes []byte) AirportData {
 	}
 }
 
-func getDataFromPayload(payload []byte) (int64, float64) {
-	return 0, 0
+func getDataFromPayload(payload []byte) (int64, float64, string) {
+	return data.ByteToValues(payload)
 }
 
 func getDataFromTopic(topic string) (string, string) {

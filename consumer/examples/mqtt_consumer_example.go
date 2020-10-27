@@ -7,6 +7,7 @@ import (
 
 func main() {
 	mqttConsumer := consumer.NewMqttConsumer(
+		"airport/#",
 		func(bytes []byte) {
 			log.Printf("Data received: %v", bytes)
 		},

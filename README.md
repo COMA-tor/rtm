@@ -19,6 +19,7 @@ The agent runner allows to run a measurement agent directly in the cli.
 Install it by using this command: 
 
 ```sh
+go get github.com/COMA-tor/rtm/agent/runner
 go install github.com/COMA-tor/rtm/agent/runner
 ```
 

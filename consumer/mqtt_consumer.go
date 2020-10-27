@@ -2,9 +2,10 @@ package consumer
 
 import (
 	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 	"time"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 type MqttConsumer struct {
@@ -12,7 +13,7 @@ type MqttConsumer struct {
 	client mqtt.Client
 }
 
-func NewMqttConsumer(topic string, handleData func(bytes []byte)) MqttConsumer {
+func NewMqttConsumer(topic string, brokerHost string, brokerPort string, handleData func(bytes []byte)) MqttConsumer {
 	log.Printf("Trying to connect (%s, %s)", brokerHost, brokerPort)
 
 	opts := mqtt.NewClientOptions()
@@ -21,11 +22,11 @@ func NewMqttConsumer(topic string, handleData func(bytes []byte)) MqttConsumer {
 
 	client := mqtt.NewClient(opts)
 
-	if token := client.Connect(); !token.WaitTimeout(3 * time.Second) && token.Error() != nil {
+	if token := client.Connect(); !token.WaitTimeout(3*time.Second) && token.Error() != nil {
 		log.Fatal(token.Error())
 	}
 
-	log.Println("client is connected :",client.IsConnected())
+	log.Println("client is connected :", client.IsConnected())
 
 	return MqttConsumer{
 		DefaultConsumer: DefaultConsumer{

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/COMA-tor/rtm/consumer"
 )
 
@@ -13,6 +14,8 @@ func main() {
 	mqttToRedisConsumer := consumer.NewMqttToRedisConsumer(
 		redisHost1,
 		fmt.Sprint(redisPort1),
+		"localhost",
+		"1883",
 		clientName1,
 	)
 

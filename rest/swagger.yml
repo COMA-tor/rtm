@@ -1,0 +1,95 @@
+swagger: "2.0"
+info:
+  title: Airport sensor measurements
+  description: A REST api used to get filtered measurements from airport sensors.
+  version: 1.0.0
+definitions:
+  measure:
+    type: object
+    properties:
+      timestamp:
+        type: integer
+      value:
+        type: number
+      unit:
+        type: string
+    required:
+      - timestamp
+      - value
+      - unit
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+paths:
+  /airport/{IATA}:
+    get:
+      parameters:
+        - name: IATA
+          required: true
+          type: string
+          in: path
+      responses:
+        200:
+          description: Returns the latest measurement for each type from the given airport
+          schema:
+            type: object
+            properties:
+              temperature:
+                $ref: '#/definitions/measure'
+              pressure:
+                $ref: '#/definitions/measure'
+              windspeed:
+                $ref: '#/definitions/measure'
+            required:
+              - temperature
+              - pressure
+              - wind_speed
+  /airport/{IATA}/{type}:
+    get:
+      parameters:
+        - name: IATA
+          required: true
+          type: string
+          in: path
+        - name: type
+          required: true
+          type: string
+          in: path
+        - name: count
+          description: Number of measures to return
+          default: 50
+          required: false
+          type: integer
+          in: query
+        - name: step
+          description: Time step between measures for aggregation in ms
+          default: 1000
+          required: false
+          type: integer
+          in: query
+      responses:
+        200:
+          description: Returns an array of the latest measurements of the given type from the given airport
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/measure'
+  /airport/{IATA}/{type}/last:
+    get:
+      parameters:
+        - name: IATA
+          required: true
+          type: string
+          in: path
+        - name: type
+          required: true
+          type: string
+          in: path
+      responses:
+        200:
+          description: Returns the latest measurement of the given type from the given airport
+          schema:
+            $ref: '#/definitions/measure'

@@ -76,9 +76,8 @@ type GetAirportIATAOKBody struct {
 	// Required: true
 	Temperature *models.Measure `json:"temperature"`
 
-	// wind speed
-	// Required: true
-	WindSpeed *models.Measure `json:"wind_speed"`
+	// windspeed
+	Windspeed *models.Measure `json:"windspeed,omitempty"`
 }
 
 // Validate validates this get airport i a t a o k body
@@ -93,7 +92,7 @@ func (o *GetAirportIATAOKBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := o.validateWindSpeed(formats); err != nil {
+	if err := o.validateWindspeed(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,16 +138,16 @@ func (o *GetAirportIATAOKBody) validateTemperature(formats strfmt.Registry) erro
 	return nil
 }
 
-func (o *GetAirportIATAOKBody) validateWindSpeed(formats strfmt.Registry) error {
+func (o *GetAirportIATAOKBody) validateWindspeed(formats strfmt.Registry) error {
 
-	if err := validate.Required("getAirportIATAOK"+"."+"wind_speed", "body", o.WindSpeed); err != nil {
-		return err
+	if swag.IsZero(o.Windspeed) { // not required
+		return nil
 	}
 
-	if o.WindSpeed != nil {
-		if err := o.WindSpeed.Validate(formats); err != nil {
+	if o.Windspeed != nil {
+		if err := o.Windspeed.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("getAirportIATAOK" + "." + "wind_speed")
+				return ve.ValidateName("getAirportIATAOK" + "." + "windspeed")
 			}
 			return err
 		}

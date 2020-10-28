@@ -23,7 +23,7 @@ func NewGetAirportIATATypeParams() GetAirportIATATypeParams {
 		// initialize parameters with default values
 
 		countDefault = int64(50)
-		stepDefault  = int64(0)
+		stepDefault  = int64(1000)
 	)
 
 	return GetAirportIATATypeParams{
@@ -52,9 +52,9 @@ type GetAirportIATATypeParams struct {
 	  Default: 50
 	*/
 	Count *int64
-	/*Time step between measures for aggregation
+	/*Time step between measures for aggregation in ms
 	  In: query
-	  Default: 0
+	  Default: 1000
 	*/
 	Step *int64
 	/*

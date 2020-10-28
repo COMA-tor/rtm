@@ -20,7 +20,7 @@ import (
 var units = map[string]string{
 	"temperature": "°C",
 	"pressure":    "hPa",
-	"wind_speed":  "m/s",
+	"windspeed":   "m/s",
 }
 
 func configureFlags(api *operations.AirportSensorMeasurementsAPI) {
@@ -98,7 +98,7 @@ func configureAPI(api *operations.AirportSensorMeasurementsAPI) http.Handler {
 		return operations.NewGetAirportIATAOK().WithPayload(&operations.GetAirportIATAOKBody{
 			Pressure:    measures["pressure"],
 			Temperature: measures["temperature"],
-			WindSpeed:   measures["wind_speed"],
+			Windspeed:   measures["wind_speed"],
 		})
 	})
 

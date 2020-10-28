@@ -61,7 +61,7 @@ func init() {
                 "temperature": {
                   "$ref": "#/definitions/measure"
                 },
-                "wind_speed": {
+                "windspeed": {
                   "$ref": "#/definitions/measure"
                 }
               }
@@ -94,8 +94,8 @@ func init() {
           },
           {
             "type": "integer",
-            "default": 0,
-            "description": "Time step between measures for aggregation",
+            "default": 1000,
+            "description": "Time step between measures for aggregation in ms",
             "name": "step",
             "in": "query"
           }
@@ -206,7 +206,7 @@ func init() {
                 "temperature": {
                   "$ref": "#/definitions/measure"
                 },
-                "wind_speed": {
+                "windspeed": {
                   "$ref": "#/definitions/measure"
                 }
               }
@@ -239,8 +239,8 @@ func init() {
           },
           {
             "type": "integer",
-            "default": 0,
-            "description": "Time step between measures for aggregation",
+            "default": 1000,
+            "description": "Time step between measures for aggregation in ms",
             "name": "step",
             "in": "query"
           }

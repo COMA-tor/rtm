@@ -41,7 +41,7 @@ paths:
                 $ref: '#/definitions/measure'
               pressure:
                 $ref: '#/definitions/measure'
-              wind_speed:
+              windspeed:
                 $ref: '#/definitions/measure'
             required:
               - temperature
@@ -65,8 +65,8 @@ paths:
           type: integer
           in: query
         - name: step
-          description: Time step between measures for aggregation
-          default: 0
+          description: Time step between measures for aggregation in ms
+          default: 1000
           required: false
           type: integer
           in: query

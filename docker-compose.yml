@@ -1,0 +1,31 @@
+version: "3"
+services: 
+    redis:
+        image: redislabs/redistimeseries
+        ports: 
+            - "6379:6379"
+        restart: always
+    
+    grafana:
+        image: grafana/grafana
+        environment: 
+            - GF_INSTALL_PLUGINS=redis-datasource
+        ports: 
+            - "3000:3000"
+        volumes:
+            - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+            - grafana-storage:/var/lib/grafana
+        restart: always
+        links: 
+            - redis
+    
+    mosquitto:
+        image: eclipse-mosquitto
+        ports: 
+            - "9001:9001"
+            - "1883:1883"
+        links:
+            - redis
+
+volumes:
+    grafana-storage:

@@ -1,0 +1,7 @@
+broker_host: 172.16.135.55
+broker_port: 1883
+client_id: windspeed-cdg
+topic: /airport/CDG/windspeed
+qos: 0
+sensor_type: windspeed
+sensor_unit: m/s

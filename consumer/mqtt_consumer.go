@@ -1,9 +1,11 @@
 package consumer
 
 import (
-	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"fmt"
 	"log"
 	"time"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 type MqttConsumer struct {
@@ -11,11 +13,7 @@ type MqttConsumer struct {
 	client mqtt.Client
 }
 
-const brokerHost = "localhost"
-const brokerPort = "1883"
-const clientId = "CLIENT-001"
-
-func NewMqttConsumer() MqttConsumer {
+func NewMqttConsumer(topic string, brokerHost string, brokerPort string, handleData func(bytes []byte)) MqttConsumer {
 	log.Printf("Trying to connect (%s, %s)", brokerHost, brokerPort)
 
 	opts := mqtt.NewClientOptions()
@@ -24,25 +22,33 @@ func NewMqttConsumer() MqttConsumer {
 
 	client := mqtt.NewClient(opts)
 
-	if token := client.Connect(); !token.WaitTimeout(3 * time.Second) && token.Error() != nil {
+	if token := client.Connect(); !token.WaitTimeout(3*time.Second) && token.Error() != nil {
 		log.Fatal(token.Error())
 	}
 
-	log.Println("client1 is connected :",client.IsConnected())
+	log.Println("client is connected :", client.IsConnected())
 
 	return MqttConsumer{
 		DefaultConsumer: DefaultConsumer{
 			listenData: func() <-chan []byte {
 				out := make(chan []byte)
-				client.Subscribe("test", 0, func(client mqtt.Client, message mqtt.Message) {
-					out <- message.Payload()
+				client.Subscribe(topic, 0, func(client mqtt.Client, message mqtt.Message) {
+					out <- topicAndDataToBytes(message.Topic(), message.Payload())
 				})
 				return out
 			},
-			handleData: func(bytes []byte) {
-				log.Printf("Data received: %v", bytes)
-			},
+			handleData: handleData,
 		},
 		client: client,
 	}
+}
+
+func topicAndDataToBytes(topic string, payload []byte) []byte {
+	return []byte(
+		fmt.Sprintf(
+			"%s %v",
+			topic,
+			string(payload),
+		),
+	)
 }

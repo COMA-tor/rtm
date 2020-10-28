@@ -4,9 +4,10 @@ package restapi
 
 import (
 	"crypto/tls"
+	"net/http"
+
 	"github.com/COMA-tor/rtm/rest/models"
 	rst "github.com/RedisTimeSeries/redistimeseries-go"
-	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"

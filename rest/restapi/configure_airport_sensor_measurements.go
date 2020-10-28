@@ -27,6 +27,15 @@ func configureFlags(api *operations.AirportSensorMeasurementsAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
+func measure(point *rst.DataPoint, measureType string) *models.Measure {
+	unit := units[measureType]
+	return &models.Measure{
+		Timestamp: &point.Timestamp,
+		Value:     &point.Value,
+		Unit:      &unit,
+	}
+}
+
 func configureAPI(api *operations.AirportSensorMeasurementsAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
@@ -51,12 +60,7 @@ func configureAPI(api *operations.AirportSensorMeasurementsAPI) http.Handler {
 		if err != nil {
 			return middleware.Error(500, err)
 		}
-		unit := units[params.Type]
-		return operations.NewGetAirportIATATypeLastOK().WithPayload(&models.Measure{
-			Timestamp: &point.Timestamp,
-			Value:     &point.Value,
-			Unit:      &unit,
-		})
+		return operations.NewGetAirportIATATypeLastOK().WithPayload(measure(point, params.Type))
 	})
 
 	api.GetAirportIATATypeHandler = operations.GetAirportIATATypeHandlerFunc(func(params operations.GetAirportIATATypeParams) middleware.Responder {
@@ -76,33 +80,26 @@ func configureAPI(api *operations.AirportSensorMeasurementsAPI) http.Handler {
 		}
 
 		measures := make([]*models.Measure, len(ranges))
-		unit := units[params.Type]
-		for i, r := range ranges {
-			measures[i] = &models.Measure{
-				Timestamp: &r.Timestamp,
-				Value:     &r.Value,
-				Unit:      &unit,
-			}
+		for i, p := range ranges {
+			measures[i] = measure(&p, params.Type)
 		}
 		return operations.NewGetAirportIATATypeOK().WithPayload(measures)
 	})
 
 	api.GetAirportIATAHandler = operations.GetAirportIATAHandlerFunc(func(params operations.GetAirportIATAParams) middleware.Responder {
-		measures := make([]*models.Measure, len(units))
-		i := 0
-		for k, v := range units {
+		measures := make(map[string]*models.Measure)
+		for k := range units {
 			point, err := client.Get(k + ":" + params.IATA)
 			if err != nil {
 				return middleware.Error(500, err)
 			}
-			measures[i] = &models.Measure{
-				Timestamp: &point.Timestamp,
-				Value:     &point.Value,
-				Unit:      &v,
-			}
-			i++
+			measures[k] = measure(point, k)
 		}
-		return operations.NewGetAirportIATATypeOK().WithPayload(measures)
+		return operations.NewGetAirportIATAOK().WithPayload(&operations.GetAirportIATAOKBody{
+			Pressure:    measures["pressure"],
+			Temperature: measures["temperature"],
+			WindSpeed:   measures["wind_speed"],
+		})
 	})
 
 	api.PreServerShutdown = func() {}

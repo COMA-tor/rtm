@@ -25,7 +25,7 @@ require (
 	github.com/peterbourgon/ff/v3 v3.0.0
 	go.mongodb.org/mongo-driver v1.4.2 // indirect
 	golang.org/x/net v0.0.0-20201024042810-be3efd7ff127
-	golang.org/x/sys v0.0.0-20201024132449-ef9fd89ba245 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 )
